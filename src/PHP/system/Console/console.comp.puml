@@ -1,0 +1,13 @@
+@startuml system components
+component console <<Singleton>>
+component server <<Singleton>>
+component serverApplication
+component clientApplication
+
+console -0)- server : RootGroup
+server -(0)- serverApplication : IServerApplicationConnection
+server -0)- serverApplication : ClientGroup << ISimGroup >>
+server -0)- serverApplication : ServerGroup << ISimGroup >>
+server -(0)- clientApplication : IServerConnection
+
+@enduml

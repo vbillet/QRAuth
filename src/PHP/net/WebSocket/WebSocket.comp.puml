@@ -1,0 +1,9 @@
+@startuml WebSocket Components
+package "WebSocket Package" {
+    () IWebSocketServerApplication
+    () IWebSocketClientApplication 
+    IWebSocketClientApplication -- [WebSocketClient] 
+    [WebSocketServer] -- IWebSocketServerApplication
+    [WebSocketServer] <.left.> [WebSocketClient] : Web Socket Protocol
+}
+@enduml

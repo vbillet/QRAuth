@@ -1,0 +1,106 @@
+@startuml WebSocket package
+package "Server code"{
+    interface IWebSocketServerApplication{
+        .. Client Activity processing ..
+        + **void** onClientConnection(**WebSocketClientConnection** client)
+        + **void** onClientDeconnection(**WebSocketClientConnection** client)
+        + **void** onClientMessage(**WebSocketClientConnection** client,**string** Message)
+        .. Server Activity processing ..
+        + **void** onServerStarted(**WebSocketServer** server)
+        + **void** onServerStopped(**WebSocketServer** server)
+        + **void** onServerRestart(**WebSocketServer** server)
+    }
+    abstract class WebSocketApplication << (A,#77FF00) Abstract Prototype >> {
+        + constructor()
+        .. Client Activity processing ..
+        + {abstract} **void** onClientConnection(**WebSocketClientConnection** client);
+        + {abstract} **void** onClientDeconnection(**WebSocketClientConnection** client);
+        + {abstract} **void** onClientMessage(**WebSocketClientConnection** client,**string** Message);
+        .. Server Activity processing ..
+        + {abstract} **void** onServerStarted(**WebSocketServer** server);
+        + {abstract} **void** onServerStopped(**WebSocketServer** server);
+        + {abstract} **void** onServerRestart(**WebSocketServer** server);
+    }
+    class WebSocketApplicationConnection << (S,#FF7700) Singleton >> {
+        # {static} instance = null
+        - **IWebSocketApplication** appInstance = null;
+        __
+        + constructor()
+        .. Connection Initialization ..
+        + **void** RegisterApplication(**WebSocketApplication** app)
+        .. Client Activity processing ..
+        + **void** onClientConnection(**WebSocketClientConnection** client)
+        + **void** onClientDeconnection(**WebSocketClientConnection** client)
+        + **void** onClientMessage(**WebSocketClientConnection** client,string Message)
+        .. Server Activity processing ..
+        + **void** onServerStarted(**WebSocketServer** server)
+        + **void** onServerStopped(**WebSocketServer** server)
+        + **void** onServerRestart(**WebSocketServer** server)
+    }
+    class WebSocketServer << (S,#FF7700) Singleton >> {
+        # {static} instance = null;
+        - **Socket** socketServer
+        - **Socket[]** socketList = []
+        - **WebSocketClientConnection[]** acceptedClients = []
+        - **SimGroup** clientGroup = null
+        - **SimGroup** serverGroup = null
+        - **ICryptography** crypto = CryptoNone
+        __
+        + constructor()
+        .. Server Execution ..
+        - **void** createServer(host,port)
+        - **void** runServer()
+        - **void** doServer() 
+        .. Activity ..
+        - acceptClientConnection()
+        + **void** disconnect(**Socket** socket) 
+        - **bool** handShake(**Socket** socket, **Buffer** buffer) 
+        .. Data Reception..
+        - **void** recieveFromClient(**Socket** socket)
+        - **void** recieve(**WebSocketClientConnection** client, **Buffer** buffer)
+        - **string** parse(**Buffer** buffer) 
+        .. Send Data ..
+        + **void** send(**WebSocketClientConnection** client,**string* message)
+        + **void** broadcast(**string** message)
+        - **string** build(msg) 
+        .. Cryptography ..
+        - {static} **ICryptograpy** getCryptographicProtocol()
+        + {static} **void** setCryptographicProtocol(**ICryptography** crypto)
+        .. Groups ..
+        + {static} **SimGroup** getServerGroup()
+        + {static} **SimGroup** getClientGroup()
+        .. Error Management ..
+        - **void** showSocketError(**string** msg)
+        - **bool** checkSocketError(**bool** chk,**string** msg)
+    }
+    class WebSocketClientConnection << (C,#0077FF) ClientConnection >> {
+        - **string** ip=null;
+        - **string** port=null;
+        - **Socket** socket = null;
+        - **int** stage = 0;
+        + construct(**Socket** socket,**string** ip,**string** port)
+        + **string** getIP()
+        + **string** getPort()
+        + **Socket** getSocket()
+        + **void** setStage(**int** stage) 
+        + **int** getStage()
+        + **string** getClientInfo() 
+    }
+    class Config << (S,#FF7700) Singleton >> {
+        + **int** MaxClient
+        + **string** Host
+        + **int** MinPort
+        + **int** MaxPort
+    }
+    WebSocketServer "1" *-- "0..Config.MaxClient" WebSocketClientConnection
+    WebSocketApplication --|> "Implements" IWebSocketServerApplication
+    WebSocketApplicationConnection --> "Dispatch to registered app" WebSocketApplication
+    WebSocketServer --> "Triggers" WebSocketApplicationConnection
+    WebSocketServer --> "Uses" Config
+}
+Package "Client code" {
+    class WebSocketServerconnection {
+
+    }
+}
+@enduml

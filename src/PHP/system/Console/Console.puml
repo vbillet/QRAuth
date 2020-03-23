@@ -1,0 +1,143 @@
+@startuml system
+abstract class Singleton {
+    __constructor()
+    # {static} **bool** isInstancied()
+    + {static} **variant** get() 
+}
+
+class console << (S,#FF7700) Singleton >> {
+    # {static} instance = null
+    - **string** logFile = "undefined.log"
+    - **string** logDir = "log"
+    - **string** guidMap = []
+    - **simGroup** {static} rootGroup
+    __
+    + constructor()
+    .. simObjects ..
+    + {static} **string** getGUID(obj)
+    + {static} **simGroup** getRoot()
+    + {static} **simObject** getById(guid)
+    + {static} **void** Delete(guid)
+    .. Logging ..
+    - {static} **float** microtime_float()
+    + {static} **void** Log(**string** message)
+    + {static} **void** Error(message)
+    .. A déplacer ..
+    + {static} **string** getRequest(req)
+}
+console --|> Singleton
+class Field {
+    + {static} ftInteger = 0
+    + {static} ftByte = 1
+    + {static} ftString = 2
+    + {static} ftFloat = 3
+    + {static} ftDate = 4
+    + {static} ftTime = 5
+    + {static} ftDateTime = 6
+    + {static} ftBoolean = 7
+    + {static} ftMemo = 8
+    + {static} ftBlob = 9
+    + {static} ftAutoInc = 100
+    + fieldName
+    + fieldType
+    + size
+    + default
+    + constructor(**string** fieldName,**int** fieldType,**int** size,**string** default)
+    + void init()
+    + **variant** set(**variant** value)
+    + **variant** get()
+}
+class Fields {
+    - fields = []
+    - fieldIdx=0
+    - fieldCount=0
+    - parentClass = null
+    + constructor(**string** parentClass)
+    + **string** getParentClass()
+    + **[Field]** get() 
+    + **Field** getByName(**string** $fieldName)
+    + **void addField(**Field** newField) 
+    + **int** getCount()
+    + **void removeField(**string**fieldName) 
+}
+class FieldsManager << (S,#FF7700) Singleton >> {
+    - {static} **Fields** classFields = []
+    - {static} **string** currentClassDefinition = null
+    # {static} **FieldsManager** instance = null
+    __
+    + {static} **void** BEGIN_FIELDS_DECLARATION(**string** className,**string** parentClass)
+    + {static} **void** DECLARE_FIELD(**string** fieldName,**string** fieldType,**int** size,**string** default)
+    + {static} **void** END_FIELDS_DECLARATION()
+    + {static} **Field** getField($className,$fieldName)
+}
+FieldsManager --|> Singleton
+FieldsManager *-- "0..n" Fields
+Fields *-- "0..n" Field
+class SimObject{
+    # **string** id
+    # **string** objectName
+    # **string** parent=null
+    __
+    + constructor(**string** guid=null)
+    .. Field Control ..
+    + **void** __set(**string** pName, **string** pValue)
+    + **void** addField(**string** field)
+    + **bool** setName(**string** pName) 
+    + **string** getName() 
+    + **string** getID() 
+    .. console ..
+    + **void** dump()
+    + **void** Delete()
+    .. Hierarchy ..
+    + **SimObject** getParent() 
+    + **void** setParent(**SimObject** parent) 
+    .. Serialization ..
+    + **string** toXML() 
+    + **string** toJSON() 
+    .. Prototyping ..
+    + **SimObject** clone()
+}
+interface ISimObject{
+    + constructor(**string** guid=null)
+    .. Field Control ..
+    + **void** __set(**string** pName, **string** pValue)
+    + **void** addField(**string** field)
+    + **bool** setName(**string** pName) 
+    + **string** getName() 
+    + **string** getID() 
+    .. console ..
+    + **void** dump()
+    + **void** Delete()
+    .. Hierarchy ..
+    + **SimObject** getParent() 
+    + **void** setParent(**SimObject** parent) 
+    .. Serialization ..
+    + **string** toXML() 
+    + **string** toJSON() 
+    .. Prototyping ..
+    + **SimObject** clone()
+}
+SimObject --|> ISimObject
+class SimGroup  {
+    - **[SimObject]** $childs=[];
+    __
+    + constructor()
+    + **void** add($sim)
+    + **void** remove($sim)
+    + **int** count()
+    + **[SimObjet]** getChilds()
+}
+interface ISimGroup  {
+    - **[SimObject]** $childs=[];
+    __
+    + constructor()
+    + **void** add($sim)
+    + **void** remove($sim)
+    + **int** count()
+    + **[SimObjet]** getChilds()
+}
+SimGroup --|> SimObject
+SimGroup --|> ISimGroup
+ISimGroup --|> ISimObject
+console *-- "1" SimGroup : RootGroup
+@enduml

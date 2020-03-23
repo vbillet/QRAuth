@@ -1,0 +1,45 @@
+@startuml WebSocket Deployment
+storage dev {
+    storage SourceDir {
+        folder WebSocketServer [
+            **src/net/WebSocket/WebSocketServer**
+            ===
+            IWebSocketServerApplication.php
+            WebSocket.php
+            WebSocketApplication.php
+            WebSocketApplicationConnection.php
+            WebSocketClientConnection.php
+            WebSocketServer.php
+        ]
+        folder WebSocketClient [
+            **src/net/WebSocket/WebSocketClient**
+            ===
+        ]
+    }
+    storage preprod {
+        queue Obfuscator
+        folder obfuscationJS [
+            **js**
+            ===
+            src.obf.js
+            src.obf.key
+            src.obf.strings
+            src.obf.png
+        ]
+    }
+}
+
+storage Server {
+    folder WebSocketServerServer [
+        **src/net/WebSocket/WebSocketServer**
+    ]
+    folder JavaScript [
+        **src/js**
+    ]
+}
+WebSocketServer -> WebSocketServerServer : copy files
+WebSocketClient -> Obfuscator : Select Directory
+Obfuscator -> obfuscationJS
+obfuscationJS -> JavaScript
+
+@enduml
