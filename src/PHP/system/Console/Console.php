@@ -18,7 +18,7 @@ class console extends Singleton{
         }
         console::$rootGroup = new SimGroup();
         console::$rootGroup->setName("RootGroup");
-        console::Log("UMLWizard v1.0");
+        console::Log(Config::getAppName());
     }
     public static function getRoot(){
         return console::$rootGroup;

@@ -1,6 +1,6 @@
 <?php
+	echo "Loading console package\n";
     require_once "Singleton.php";
-    require_once "../Config.php";
     require_once "Field.php";
     require_once "Fields.php";
     require_once "FieldsManager.php";

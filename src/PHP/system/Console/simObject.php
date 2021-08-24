@@ -1,5 +1,8 @@
 <?php
 
+if (defined("__SIMOBJECT")) { return; }
+define("__SIMOBJECT",true);
+
 FieldsManager::BEGIN_FIELDS_DECLARATION("SimObject",null);
 FieldsManager::DECLARE_FIELD("id",Field::$ftString,32,"");
 FieldsManager::DECLARE_FIELD("objectName",Field::$ftString,50,"");
@@ -61,7 +64,7 @@ class SimObject{
         console::Delete($this->id);
         if ($this->parent!=null)
             console::getById($this->parent)->remove($this);
-        unset($this);
+        //unset($this);
     }
     public function toXML() { 
         $vars = get_object_vars($this);

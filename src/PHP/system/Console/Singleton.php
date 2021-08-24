@@ -4,7 +4,10 @@
      * @author: Vincent BILLET
      * @lastupdate : 2020/01/17
      */
-    abstract class Singleton {
+	if (defined("SINGLETON")) { return; }
+	define("SINGLETON",true);
+
+	abstract class Singleton {
         function __construct() {
             if (self::isInstancied()) { throw new Exception(get_called_class()." is a Singleton, so you can instanciate it only once."); }
             eval(get_called_class()."::\$instance=\$this;");
