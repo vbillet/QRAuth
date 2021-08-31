@@ -1,0 +1,12 @@
+<apps>
+	<app id="0123456789abcdef0123456789abcdef">
+		<appname>QRAuth Démo</appname>
+		<appdomain>192.168.1.9</appdomain>
+		<webmaster>vbillet@gmail.com</webmaster>
+	</app>
+	<app id="fedcba9876543210fedcba9876543210">
+		<appname>QRAuthServer Application Registration</appname>
+		<appdomain>192.168.1.9</appdomain>
+		<webmaster>vbillet@gmail.com</webmaster>
+	</app>
+</apps>

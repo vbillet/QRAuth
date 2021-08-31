@@ -1,0 +1,70 @@
+@startuml QRAuth Autentication
+header
+last-updated 2020/03/31
+end header
+title
+QRAuth Autentication
+end title
+footer
+authored by Vincent BILLET
+end footer
+
+actor Mobile
+group Load Login page
+	autonumber 10 10 "<font color=red><b>[LOG 000]"
+	Browser -> App: GET App frontpage
+	App -> QRAuthServer: GET SessionStart(AppKey)
+	App <-- QRAuthServer: Session Token
+	Browser <-- App: frontpage (With Session Token)
+	autonumber resume "<font color=blue><b>[LOG 000]"
+	Browser -> QRAuthServer: WS request AuthBox (Session Token)
+	Browser <-- QRAuthServer: Command AuthBox (Browser Public IP)
+	autonumber resume "<font color=green><b>[LOG 000]"
+	Browser -> Browser: Generate Init QRCode (Token+IP publique)
+end
+group Key Exchange Initilization
+	autonumber 10 10 "<font color=purple><b>[KEI 000]"
+	Mobile <- Browser: Scan QRCode
+	autonumber resume "<font color=red><b>[KEI 000]"
+	Mobile -> QRAuthServer: GET (Token+IP+IDTel)
+	Mobile <-- QRAuthServer: Response TokenValidity
+	autonumber resume "<font color=blue><b>[KEI 000]"
+	Browser <-- QRAuthServer: Command Generate BB84 Key
+end
+loop BB84 Key Exchange : while Key not completed
+	autonumber 10 10 "<font color=green><b>[BB84 000]"
+	QRAuthServer -> QRAuthServer: Generate Server basis [{+,x}]
+	Browser -> Browser: Generate BB84 Photon/basis [{0,1}/{+,x}] 
+	autonumber resume "<font color=purple><b>[BB84 000]"
+	Mobile <- Browser: Scan BB84 Photon QRCode 
+	autonumber resume "<font color=red><b>[BB84 000]"
+	Mobile -> QRAuthServer: GET BB84 Part (Send Photon)
+	autonumber resume "<font color=blue><b>[BB84 000]"
+	Browser <-- QRAuthServer: Command Basis list 
+	autonumber resume "<font color=red><b>[BB84 000]"
+	Mobile <-- QRAuthServer: Response ACK
+	autonumber resume "<font color=green><b>[BB84 000]"
+	Browser -> Browser: Compute good basis
+	autonumber resume "<font color=blue><b>[BB84 000]"
+	Browser -> QRAuthServer: Send final basis list [{+,x}]
+end
+group Key Exchange finalization
+	Browser -> Browser: Compute Final Key
+	Browser -> Browser: Compute Final QRCode
+	Browser -> Mobile: Scan Final QRCode
+	Mobile -> QRAuthServer: Send Final ACK
+	QRAuthServer -> QRAuthServer: Compute Final key
+	Browser <-- QRAuthServer : Auth OK
+	QRAuthServer --> Mobile: Auth OK
+	Mobile -> Mobile: Switch to antoher activity or close
+end
+group Send Key to Server
+	autonumber resume "<font color=red><b>[000]"
+	Browser -> App: GET AuthOK
+	App -> QRAuthServer: GET Auth Data (Session Token)
+	QRAuthServer --> App: Send Auth Data (User Token + Key)
+	App->App:Load User Data
+	App-->Browser:Send User Data
+	Browser->Browser:Display User Data
+end
+@enduml

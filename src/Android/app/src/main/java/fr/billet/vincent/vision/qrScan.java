@@ -42,6 +42,7 @@ public class qrScan  {
     private static SurfaceHolder.Callback surfaceCB;
     private CameraSource cameraSource;
     private BarcodeDetector barcodeDetector;
+    private String lastDetecion = "";
     public qrScan(Object obj, Context ctx, SurfaceView surface){
         cameraPreview = surface;
         context = ctx;
@@ -123,14 +124,17 @@ public class qrScan  {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes=detections.getDetectedItems();
                 if(barcodes.size()>0){
-                    //Log.i("QRScan",barcodes.valueAt(0).displayValue);
-                    try{
-                        Method m = qrScan.app.getClass().getMethod("onScan",String.class);
-                        m.invoke(qrScan.app,barcodes.valueAt(0).displayValue);
-                    } catch (Exception e){
-                        // Nothing
+                    String detection = barcodes.valueAt(0).displayValue;
+                    Log.i("QRScan",detection);
+                    if (!lastDetecion.equals(detection)) {
+                        lastDetecion = detection;
+                        try {
+                            Method m = qrScan.app.getClass().getMethod("onScan", String.class);
+                            m.invoke(qrScan.app, detection);
+                        } catch (Exception e) {
+                            // Nothing
+                        }
                     }
-
                     /*setResult(CommonStatusCodes.SUCCESS,intent);
                     finish();*/
                 }

@@ -13,7 +13,9 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Method;
@@ -73,6 +75,7 @@ public class networkTools {
      * @param ctx Contexte de l'application
      * @param netNeeded réseaux utilisés par l'application : networkTools.NEED_MOBILE | networkTools.NEED_WIFI
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public networkTools(Object obj, Context ctx, int netNeeded){
         appContext = ctx.getApplicationContext();
         app = obj;
@@ -401,6 +404,7 @@ public class networkTools {
     /**
      * Termine l'utilisation des réseaux par networkTools.
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void finishNet() {
         ConnectivityManager connMgr = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 

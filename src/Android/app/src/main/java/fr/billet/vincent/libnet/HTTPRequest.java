@@ -6,7 +6,10 @@ package fr.billet.vincent.libnet;
  */
 
 import android.net.Network;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,6 +21,7 @@ public class HTTPRequest {
 
     public HTTPRequest(){}
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public String GET(Network net, String url){
         String result="";
         try {

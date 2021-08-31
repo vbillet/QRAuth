@@ -1,20 +1,57 @@
 <?php
+/**
+ * @package WebSocketServer\Main
+ */
+
+ /**
+  * This class is the main WebSocket server class. 
+  *
+  * WebSocket servers are always Singletons and are automatically instancied 
+  * when you're crating a webService.
+  */
 class WebSocketServer extends Singleton {
-    protected static $instance = null;
-    /**
-     * @var array $sockets
-     */
-    //private $sockets = [];
-    private $socketServer;
-    private $socketList = [];
-    private $accepted = [];
-    private $clientGroup = null;
-    private $serverGroup = null;
-    public $crypto = null;
-    public function __construct() {
-        parent::__construct();
-        $host = "192.168.1.9";
-        $port = "8080";
+
+	/** @var WebServer It's the unique instance of a WebServer service */
+	protected static $instance = null;
+
+	/** @var Socket Main Socket listener */
+	private $socketServer;
+
+	/** @var Array Array of client Socket */
+	private $socketList = [];
+
+	/** @var Array Array of boolean (true : socket connection accepted; false : socket connection pending) */
+	private $accepted = [];
+
+	/** @var SimGroup Contain a list of all clientConnections */
+	private $clientGroup = null;
+
+	/** @var SimGroup Contain a hierarchy of all NetObject available */
+	private $serverGroup = null;
+
+	/** @var Object  This object contain a cryptographic object (@see crypto) */
+	public $crypto = null;
+	
+	/**
+	 * WebServer constructor.
+	 * 
+	 * This is an internal class. You should never use this class.
+	 * @param String host name or IP
+	 * @param String Server TCP/IP port
+	 * @param ICryptography Cryptographic Interface. If null, WebSocketServer will use CryptoNone.
+	 */
+    public function __construct($hst=null,$prt=null) {
+		parent::__construct();
+		if ($hst==null){
+			$host = Config::getHost();
+		} else {
+			$host=$hst;
+		}
+		if ($prt==null){
+			$port = Config::getWSPort();
+		} else{
+			$port = $prt;
+		}
         $this->serverGroup = new SimGroup();
         $this->serverGroup->setName("serverGroup");
         $this->clientGroup = new SimGroup();
@@ -22,7 +59,10 @@ class WebSocketServer extends Singleton {
         $this->crypto = new CryptoNone();
         $this->createServer($host,$port);
         $this->runServer();
-    }
+	}
+	/**
+	 * 
+	 */
     private function showSocketError($msg){
         $err_code = socket_last_error();
         $err_msg = socket_strerror($err_code);
@@ -103,7 +143,6 @@ class WebSocketServer extends Singleton {
             $this->accepted[(int)$socket]->Delete();
             unset($this->accepted[(int)$socket]);
         }
-        //$this->showClientGroup();
     }
     
     public static function disconnect(clientConnection $client){
